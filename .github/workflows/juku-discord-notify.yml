@@ -1,0 +1,19 @@
+  name: Discord Notify
+  on:
+    push:
+      paths:
+        - '**/discord_summary.txt'
+  jobs:
+    notify:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+          with:
+            fetch-depth: 2
+        - name: notify
+          run: |
+            FILE=$(git diff-tree --no-commit-id -r --name-only ${{ github.sha }} | grep discord_summary
+   | head -1)
+            [ -z "$FILE" ] && exit 0
+            curl -s -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" -H "Content-Type: application/json" -d
+   "{\"content\": $(cat "$FILE" | head -c 1900 | jq -Rs .)}"
