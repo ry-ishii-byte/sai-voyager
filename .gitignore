@@ -1,0 +1,15 @@
+# Secrets
+reference/secrets/
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+
+# Google Drive shortcuts
+*.gdoc
+*.gsheet
+*.gslides
+*.gdraw
+*.gform
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,12 @@
+{
+  "name": "google-calendar-auth",
+  "version": "1.0.0",
+  "description": "Google Calendar OAuth認証スクリプト",
+  "main": "auth.js",
+  "scripts": {
+    "auth": "node auth.js"
+  },
+  "dependencies": {
+    "googleapis": "^144.0.0"
+  }
+}
