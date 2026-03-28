@@ -1,27 +1,32 @@
-  name: Discord Notify
-  on:
-    push:
-      branches:
-        - master
-      paths:
-        - '**/discord_summary.txt'
-  jobs:
-    notify:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-          with:
-            fetch-depth: 2
-        - name: Send to Discord
-          env:
-            DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-            SHA: ${{ github.sha }}
-          run: |
-            FILE=$(git diff-tree --no-commit-id -r --name-only "$SHA" | grep discord_summary | head -1)
-            if [ -z "$FILE" ]; then
-              echo "No file"
-              exit 0
-            fi
-            CONTENT=$(cat "$FILE" | head -c 1900)
-            PAYLOAD=$(jq -n --arg c "$CONTENT" '{"content": $c}')
-            curl -s -X POST "$DISCORD_WEBHOOK_URL" -H "Content-Type: application/json" -d "$PAYLOAD"  
+name: Discord Notify
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '**/discord_summary.txt'
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Send to Discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          FILE=$(git diff-tree --no-commit-id -r --name-only "${{ github.sha }}" | grep discord_summary | head -1)
+          if [ -z "$FILE" ]; then
+            echo "No file"
+            exit 0
+          fi
+          CONTENT=$(cat "$FILE" | head -c 1900)
+          PAYLOAD=$(jq -n --arg c "$CONTENT" '{"content": $c}')
+          curl -sS -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
